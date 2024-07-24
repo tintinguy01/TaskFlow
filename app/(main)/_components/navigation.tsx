@@ -16,12 +16,14 @@ import TrashBox from "./trash-box";
 import { useSearch } from "@/hooks/use-search";
 import { useSettings } from "@/hooks/use-setting";
 import { Navbar } from "./navbar";
+import { useEventForm } from "@/hooks/use-event-form";
 
 const Navigation = () => {
     const router = useRouter();
     const settings = useSettings();
     const search = useSearch();
     const params = useParams();
+    const events = useEventForm();
     const pathname = usePathname();
     const isMobile = useMediaQuery("(max-width: 768px)");
     const create = useMutation(api.documents.create);
@@ -31,6 +33,7 @@ const Navigation = () => {
     const navbarRef = useRef<ElementRef<"div">>(null);
     const [isResetting, setIsResetting] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(isMobile);
+    const [isAddingEvent, setIsAddingEvent] = useState(false)
 
     useEffect(() => {
         if (isMobile) {
@@ -114,6 +117,10 @@ const Navigation = () => {
         });
     };
 
+    const handleAddEvent = () => {
+        setIsAddingEvent(true);
+    };
+
     return ( 
         <>
             <aside ref={sidebarRef} className={cn(
@@ -157,9 +164,8 @@ const Navigation = () => {
                 </div>
 
                 <div>
-                <Item icon={Table} 
-                label="Scheduler" 
-                onClick={() => {router.push("/documents/scheduler")}} />
+                    <Item onClick={events.onOpen}
+                    icon={Plus} label="Add calendar event" />
                 </div>
 
                 <div onMouseDown={handleMouseDown}

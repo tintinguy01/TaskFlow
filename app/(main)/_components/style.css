@@ -1,0 +1,9 @@
+.sx-react-calendar-wrapper {
+    height: 100vh;
+  }
+  
+.sx__time-grid-event-inner:hover {
+    cursor: pointer;
+}
+
+  

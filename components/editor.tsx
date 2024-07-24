@@ -11,11 +11,13 @@ import { useEdgeStore } from "@/lib/edgestore";
 interface EditorProps {
     onChange: (content: string) => void;
     initialContent?: string;
+    editable?: boolean
 };
 
 const Editor: React.FC<EditorProps> = ({
     onChange,
-    initialContent
+    initialContent,
+    editable = true // Default to true if not provided
 }) => {
 
     const { resolvedTheme } = useTheme();
@@ -41,6 +43,7 @@ const Editor: React.FC<EditorProps> = ({
                 editor={editor}
                 theme={resolvedTheme === "dark" ? "dark" : "light"}
                 onChange={handleChange}
+                editable={editable} // Control editable state here
             />
         </div>
     );

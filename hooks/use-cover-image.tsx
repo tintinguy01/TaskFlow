@@ -1,5 +1,3 @@
-
-
 import { create } from "zustand";
 
 type CoverImageStore = {
