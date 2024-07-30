@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -20,49 +19,55 @@ import DatetimePickerCalendarSettings from "../date-picker";
 import TypeSelector from "../selector";
 import { useRouter } from "next/navigation";
 import { Description } from "@radix-ui/react-dialog";
-import React from "react";
+import React, { useEffect } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 
 const formSchema = z.object({
   Title: z.string(),
-  Start: z.date(),
-  End: z.date(),
+  Start: z.date().optional(),
+  End: z.date().optional(),
   Type: z.string(),
 });
 
 export const EventForm = () => {
   const router = useRouter();
   const { isOpen, onClose } = useEventForm();
-
   const create = useMutation(api.events.create);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       Title: '',
-      Start: new Date(),
-      End: new Date(),
+      Start: undefined,
+      End: undefined,
       Type: '',
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const startDate = new Date(values.Start);
-    const endDate = new Date(values.End);
+  useEffect(() => {
+    if (isOpen) {
+      form.reset({
+        Title: '',
+        Start: undefined,
+        End: undefined,
+        Type: '',
+      });
+    }
+  }, [isOpen, form]);
 
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    const startDate = values.Start ? new Date(values.Start) : undefined;
+    const endDate = values.End ? new Date(values.End) : undefined;
+
+    if (startDate && isNaN(startDate.getTime()) || endDate && isNaN(endDate.getTime())) {
       console.error('Invalid dates!');
       return;
     }
 
-    const timezoneOffsetMinutes = startDate.getTimezoneOffset();
-    startDate.setMinutes(startDate.getMinutes() - timezoneOffsetMinutes);
-    endDate.setMinutes(endDate.getMinutes() - timezoneOffsetMinutes);
-
-    const startDateString = startDate.toISOString().slice(0, 16).replace('T', ' ');
-    const endDateString = endDate.toISOString().slice(0, 16).replace('T', ' ');
+    const startDateString = startDate ? startDate.toISOString().slice(0, 16).replace('T', ' ') : '';
+    const endDateString = endDate ? endDate.toISOString().slice(0, 16).replace('T', ' ') : '';
 
     const onCreate = () => {
       const promise = create({ 
